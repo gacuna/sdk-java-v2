@@ -27,9 +27,10 @@ public enum Status {
     INVOICE_NOT_GENERATED,
     REVERSED,
     ADHERED,
+    CANCELLED, // status for cancelled refunds
     UNDEFINED;
 
-    private static Map<String, Status> statusMap = new HashMap<>(13);
+    private static Map<String, Status> statusMap = new HashMap(13);
     static {
         statusMap.put("approved", APPROVED);
         statusMap.put("pre_approved", PRE_APPROVED);
@@ -47,6 +48,7 @@ public enum Status {
         statusMap.put("invoice_not_generated", INVOICE_NOT_GENERATED);
         statusMap.put("reversed", REVERSED);
         statusMap.put("adhered", ADHERED);
+        statusMap.put("cancelled", CANCELLED);
         statusMap.put("undefined", UNDEFINED);
     }
 

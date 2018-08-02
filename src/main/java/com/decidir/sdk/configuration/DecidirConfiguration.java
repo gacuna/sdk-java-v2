@@ -1,12 +1,11 @@
 package com.decidir.sdk.configuration;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
+
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.decidir.sdk.converters.DecidirConverter;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -17,7 +16,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
  */
 public class DecidirConfiguration {
 
-    static private final String version = "0.1.6";
+    static private final String version = "2.2";
     public static final String CACHE_CONTROL = "Cache-Control";
     public static final String MAX_AGE_0 = "max-age=0";
     public static final String USER_AGENT = "User-Agent";
@@ -46,14 +45,10 @@ public class DecidirConfiguration {
                 return chain.proceed(request);
             }
         });
-        
-        ObjectMapper jacksonConverter = new ObjectMapper();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-		jacksonConverter.setDateFormat(dateFormat);
+
 		retrofit2.Retrofit retrofit = new retrofit2.Retrofit.Builder()
                 .baseUrl(apiUrl)
-                .addConverterFactory(JacksonConverterFactory.create(jacksonConverter))
+                .addConverterFactory(JacksonConverterFactory.create(new DecidirConverter().getObjectMapper()))
                 .client(httpClient.build())
                 .build();
 

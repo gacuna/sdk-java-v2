@@ -1,51 +1,50 @@
 package com.decidir.sdk
 
-import com.decidir.sdk.dto.BillingData
-import com.decidir.sdk.dto.CardData
-import com.decidir.sdk.dto.CardFraudDetectionData
-import com.decidir.sdk.dto.CardTokenData
-import com.decidir.sdk.dto.CardTrackInfo
-import com.decidir.sdk.dto.Channel
-import com.decidir.sdk.dto.Currency
-import com.decidir.sdk.dto.Customer
-import com.decidir.sdk.dto.CustomerInSite
-import com.decidir.sdk.dto.DayOfWeekOfFlight
-import com.decidir.sdk.dto.DecisionManagerTravel
-import com.decidir.sdk.dto.DepartureDate
-import com.decidir.sdk.dto.FraudDetectionDataResponse
-import com.decidir.sdk.dto.Identification
-import com.decidir.sdk.dto.IdentificationType
-import com.decidir.sdk.dto.Item
-import com.decidir.sdk.dto.JourneyType
-import com.decidir.sdk.dto.Passenger
-import com.decidir.sdk.dto.PassengerStatus
-import com.decidir.sdk.dto.PassengerType
-import com.decidir.sdk.dto.PaymentRequest
-import com.decidir.sdk.dto.PaymentPciCardRequest
-import com.decidir.sdk.dto.PaymentPciTokenRequest
-import com.decidir.sdk.dto.PaymentType
-import com.decidir.sdk.dto.PurchaseTotals
+import com.decidir.sdk.dto.cybersource.BillingData
+import com.decidir.sdk.dto.payments.offline.OfflinePaymentRequest
+import com.decidir.sdk.dto.payments.pci.CardData
+import com.decidir.sdk.dto.payments.pci.CardFraudDetectionData
+import com.decidir.sdk.dto.payments.pci.CardTokenData
+import com.decidir.sdk.dto.payments.pci.CardTrackInfo
+import com.decidir.sdk.dto.cybersource.Channel
+import com.decidir.sdk.dto.payments.Currency
+import com.decidir.sdk.dto.payments.Customer
+import com.decidir.sdk.dto.forms.CustomerInSite
+import com.decidir.sdk.dto.cybersource.verticals.travels.DayOfWeekOfFlight
+import com.decidir.sdk.dto.cybersource.verticals.travels.DecisionManagerTravel
+import com.decidir.sdk.dto.cybersource.verticals.travels.DepartureDate
+import com.decidir.sdk.dto.cybersource.FraudDetectionDataResponse
+import com.decidir.sdk.dto.payments.Identification
+import com.decidir.sdk.dto.payments.IdentificationType
+import com.decidir.sdk.dto.cybersource.Item
+import com.decidir.sdk.dto.cybersource.verticals.travels.JourneyType
+import com.decidir.sdk.dto.cybersource.verticals.travels.Passenger
+import com.decidir.sdk.dto.cybersource.verticals.travels.PassengerStatus
+import com.decidir.sdk.dto.cybersource.verticals.travels.PassengerType
+import com.decidir.sdk.dto.payments.PaymentRequest
+import com.decidir.sdk.dto.payments.pci.PaymentPciRequest
+import com.decidir.sdk.dto.payments.pci.PaymentPciTokenRequest
+import com.decidir.sdk.dto.payments.PaymentType
+import com.decidir.sdk.dto.cybersource.PurchaseTotals
 import com.decidir.sdk.dto.Status
-import com.decidir.sdk.dto.TicketingFraudDetectionData
-import com.decidir.sdk.dto.TicketingTransactionData
-import com.decidir.sdk.dto.TravelFraudDetectionData
-import com.decidir.sdk.dto.TravelTransactionData
-import com.decidir.sdk.exceptions.PaymentException
+import com.decidir.sdk.dto.cybersource.verticals.ticketing.TicketingFraudDetectionData
+import com.decidir.sdk.dto.cybersource.verticals.ticketing.TicketingTransactionData
+import com.decidir.sdk.dto.cybersource.verticals.travels.TravelFraudDetectionData
+import com.decidir.sdk.dto.cybersource.verticals.travels.TravelTransactionData
+import com.decidir.sdk.exceptions.responses.PaymentException
 import com.decidir.sdk.exceptions.ValidateException
 import spock.lang.Specification
-
-import java.time.ZoneOffset
 
 /**
  * Created by biandra on 05/10/16.
  */
 class PaymentServiceTests extends Specification {
 
-    public static final String secretAccessToken = '00040407'//'4cf891e492384cdeadf211564aa87007'
-    public static final String token = "a1ca9dd2-5f76-45aa-bbdf-c7d17320a2c1"
-    public static final String valid_bin = "450799"
+    public static final String secretAccessToken = '00111115'; //'781d3b4ed99d4ef6ab94a2f5d923d401'//'4cf891e492384cdeadf211564aa87007'
+    public static final String token = "0748b6e8-e2aa-4d9c-b303-a67ce2c2b4d0"
+    public static final String valid_bin = "450979"
     public static final String user_id = "decidir_test"
-    public static final String apiUrl = "http://localhost:9002"
+    public static final String apiUrl = "http://localhost:9002/"
 
 
     def decidir
@@ -187,7 +186,7 @@ class PaymentServiceTests extends Specification {
         def customer = new Customer()
         customer.id = user_id
 
-        def payment = new PaymentPciCardRequest()
+        def payment = new PaymentPciRequest()
         payment.payment_type = PaymentType.SINGLE
         payment.currency = Currency.ARS
         payment.amount = 5
@@ -242,7 +241,7 @@ class PaymentServiceTests extends Specification {
         def customer = new Customer()
         customer.id = user_id
 
-        def payment = new PaymentPciCardRequest()
+        def payment = new PaymentPciRequest()
         payment.payment_type = PaymentType.SINGLE
         payment.currency = Currency.ARS
         payment.amount = 5
@@ -468,5 +467,32 @@ class PaymentServiceTests extends Specification {
         result.result.fraud_detection.status.decision == "green"
         result.result.fraud_detection.status.reason_code == "100"
         result.result.fraud_detection.status.description == "Decision Manager processing"
+    }
+
+    def "test offline"() {
+        setup:
+
+        def payment = new OfflinePaymentRequest()
+        payment.site_transaction_id = "00000045"
+        payment.token = "3a392c0c-3ed9-4d5e-8ec1-0dfa2eccecf6"
+        payment.payment_method_id = 48
+        payment.amount = 5
+        payment.currency = Currency.ARS
+        payment.payment_type = PaymentType.SINGLE
+        payment.email = "max@gmail.com"
+        payment.invoice_expiration = "191123"
+        payment.cod_p3 = "1"
+        payment.cod_p4 = "134"
+        payment.client = "12345678"
+        payment.surcharge = 1001
+        payment.second_invoice_expiration = "191223"
+
+
+        when:
+        def result = decidir.offlinePayment(payment)
+
+        then:
+        result.status == 201
+        result.result.status == Status.APPROVED
     }
 }

@@ -1,9 +1,9 @@
 package com.decidir.sdk;
 
 import com.decidir.sdk.configuration.DecidirConfiguration;
-import com.decidir.sdk.dto.DataForm;
+import com.decidir.sdk.dto.forms.DataForm;
 import com.decidir.sdk.dto.DecidirResponse;
-import com.decidir.sdk.dto.FormResponse;
+import com.decidir.sdk.dto.forms.FormResponse;
 import com.decidir.sdk.exceptions.DecidirException;
 import com.decidir.sdk.resources.FormApi;
 import com.decidir.sdk.services.FormService;
@@ -13,7 +13,7 @@ import com.decidir.sdk.services.FormService;
  */
 public class Form {
 
-    private static String apiUrl = "https://live.decidir.com/web";
+    private static String apiUrl = "https://live.decidir.com/web/";
     private static Integer timeOut = 5;
     private FormService formService;
 

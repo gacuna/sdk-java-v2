@@ -3,10 +3,13 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: "maven-publish"
 apply plugin: 'eclipse'
+apply plugin: "maven"
+
+version = '2.3'
+group = 'com.decidir.api'
 
 sourceCompatibility = 1.7
-version = '1.3.0'
-group = 'com.decidir.api'
+targetCompatibility = 1.7
 
 jar {
     manifest {
@@ -14,12 +17,18 @@ jar {
     }
 }
 
+allprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
 //create a single Jar with all dependencies
 task releaseJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Java SDK for Decidir', 'Implementation-Version': version
     }
-    archiveName 'decidir-v'+ version +'.jar'
+    archiveName 'decidir-v'+ version +'-java7.jar'
     destinationDir project.file('dist')		
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
@@ -37,14 +46,16 @@ dependencies {
   testCompile "org.codehaus.groovy:groovy-all:2.4.6"
   testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
 
-  compile "com.squareup.retrofit2:retrofit:2.0.2"
-  compile "com.squareup.retrofit2:converter-jackson:2.0.2"
+  compile "com.squareup.retrofit2:retrofit:2.3.0"
+  compile "com.squareup.retrofit2:converter-jackson:2.3.0"
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
+        mavenJar(MavenPublication) {
+           artifact releaseJar
+           artifactId 'decidir2-sdk-java7'
+           version project.version
         }
     }
 }
@@ -52,11 +63,16 @@ publishing {
 publishing {
     repositories {
         maven {
-          credentials {
-            username "admin"
-            password "R3dB33575"
-          }
-          url "http://repo.dev.redbee.io/content/repositories/decidir-sdk-snapshot"
+            credentials {
+                username "readwrite"
+                password "YFeTajaS!FW%3!s5"
+            }
+
+            if(project.version.endsWith('-SNAPSHOT')) {
+                url "http://repo.dev.redbee.io/content/repositories/decidir-sdk-snapshot"
+            } else {
+                url "http://repo.dev.redbee.io/content/repositories/decidir-sdk"
+            }
         }
     }
 }

@@ -2,10 +2,10 @@ package com.decidir.sdk.services;
 
 import com.decidir.sdk.converters.ErrorConverter;
 import com.decidir.sdk.converters.FormConverter;
-import com.decidir.sdk.dto.DataForm;
-import com.decidir.sdk.dto.DecidirError;
+import com.decidir.sdk.dto.forms.DataForm;
+import com.decidir.sdk.exceptions.DecidirError;
 import com.decidir.sdk.dto.DecidirResponse;
-import com.decidir.sdk.dto.FormResponse;
+import com.decidir.sdk.dto.forms.FormResponse;
 import com.decidir.sdk.exceptions.DecidirException;
 import com.decidir.sdk.resources.FormApi;
 import retrofit2.Response;

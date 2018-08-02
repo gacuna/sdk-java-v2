@@ -2,8 +2,8 @@ package com.decidir.sdk.services;
 
 import com.decidir.sdk.converters.CardTokenConverter;
 import com.decidir.sdk.converters.ErrorConverter;
-import com.decidir.sdk.dto.CardTokens;
-import com.decidir.sdk.dto.DecidirError;
+import com.decidir.sdk.dto.tokens.CardTokens;
+import com.decidir.sdk.exceptions.DecidirError;
 import com.decidir.sdk.dto.DecidirResponse;
 import com.decidir.sdk.exceptions.DecidirException;
 import com.decidir.sdk.resources.CardTokenApi;

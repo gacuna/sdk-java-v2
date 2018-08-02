@@ -1,7 +1,5 @@
 package com.decidir.sdk.exceptions;
 
-import com.decidir.sdk.dto.NotFoundError;
-
 /**
  * Created by biandra on 08/07/16.
  */

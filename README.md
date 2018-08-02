@@ -4,6 +4,7 @@ Decidir SDK Java
 
 Modulo para conexión con gateway de pago DECIDIR2
 + [Introducción](#introduccion)
+  + [Soporte de Integración](#Soporte)
   + [Alcance](#scope)
   + [Diagrama de secuencia](#secuencia)
 + [Instalación](#instalacion)
@@ -14,8 +15,18 @@ Modulo para conexión con gateway de pago DECIDIR2
   + [Operatoria del Gateway](#operatoria)
     + [Ejecución del Pago](#payment)
       + [Transacción simple](#single)
+      + [Transacción PCI](#pci)
+      + [Transacción GDS](#gds)
+      + [Transacción GDS PCI](#gdspci)
+      + [Transacción BSA PCI](#bsapci)
+      + [Transacción BSA no PCI](#bsanopci)
+      + [Transacción Agro no PCI](#agronopci)
       + [Transacción distribuida](#distributed)
       + [Operación en dos pasos](#twosteps)
+      <!--- + [Transacción de Pagos VTE VISA](#pagoAgregador)(TODO) -->
+      <!--- + [Transacción de Comercio Agregador](#pagoAgregador)(TODO) -->
+      <!--- + [Transacción Offline](#pagoOffline) (TODO) -->
+      <!--- + [Transacción PMC](#pagoPMC)(TODO) -->
     + [Listado de Pagos](#getallpayments)
     + [Información de un Pago](#getpaymentinfo)
     + [Devoluciones de pagos](#refunds)
@@ -23,6 +34,7 @@ Modulo para conexión con gateway de pago DECIDIR2
       + [Anulación de Devolución Total](#deleterefund)
       + [Devolución Parcial de un Pago](#partialrefund)
       + [Anulación de Devolución Parcial](#deletepartialrefund)
+      <!--- + [Historial de Devoluciones](#historyrefund) (TODO) -->
   + [Tokenización de tarjetas de crédito](#tokenizaciontarjeta)
     + [Listado de tarjetas tokenizadas](#listadotarjetastokenizadas)
     + [Ejecución de pago tokenizado](#pagotokenizado)
@@ -46,7 +58,16 @@ Modulo para conexión con gateway de pago DECIDIR2
   + [Códigos de Medios de Pago](#codigos-de-medios-de-pago)
   + [Divisas Aceptadas](#divisasa)
   + [Provincias](#provincias)
+  + [Parámetros](#parametros)
+    + [Parámetros de Pagos](#parametrosPago)
+        + [Parámetros para PagoMisCuentas](#parametrosPMC)
+        + [Parámetros para Pago Offline](#parametrosOffline)
+        + [Parámetros para Pago Distribuido por Monto](#parametrosDistMonto)
+        + [Parámetros para Pago Distribuido por Porcentaje](#parametrosDistPorc)
+        + [Parámetros de Comercio Agregador](#parametrosAgregador)
+    + [Parámetros de Devolución](#parametrosDevolucion)
   + [Atributos de Excepciones](#atributosExcepciones)
+  + [Errores de Sistema](#erroresSistema)
 
 <a name="introduccion"></a>
 ## Introducción
@@ -78,6 +99,16 @@ Para generar el token de pago, la aplicaci&oacute;n cliente realizar&aacute; con
 
 ---
 <sup>_1 - Las API Keys serán provistas por el equipo de Soporte de DECIDIR (soporte@decidir.com.ar). _</sup>
+<a name="Soporte"></a>
+## Soporte de Integración
+**DECIDIR** ofrece un servicio de Soporte 24x7 con el siguiente alcance:
+•	Lunes a Viernes de 9 a 18 horas: Soporte Técnico, Atención Comercial y Soporte Transaccional.
+•	Fuera de Horario Laboral: Soporte Transaccional.
+**CANALES DE ATENCIÓN**
+•	Teléfono: +54 11 4379 3460
+•	Formulario de Contacto: click aquí
+•	Help Desk: soporte@decidir.com.ar
+•	Control de Red: controldered@decidir.com.ar (en caso de disrupción transaccional)
 
 [<sub>Volver a inicio</sub>](#inicio)
 
@@ -97,19 +128,34 @@ A continuación, se presenta un diagrama con el Flujo de un Pago.
 [<sub>Volver a inicio</sub>](#inicio)
 
 <a name="instalacion"></a>
-## Instalación
-Se debe descargar la última versión del SDK desde el botón Download ZIP del branch master.
-Una vez descargado y descomprimido, se debe agregar la librería `decidir.jar` que se encuentra dentro de la carpeta `./dist/`, a las librerías del proyecto y en el codigo se debe agregar siguiente import.
+## Instalaci&oacute;n
+Se encuentran disponibles *2* implementaciones para la &uacute;ltima versi&oacute;n. Una es compatible con __Java7__ _(o superior)_ y la otra con __Java6__ _(o superior)_.
+Se puede realizar la integración a través de un manager de dependencias, o bien manualmente descargando el _JAR_ desde [Github](https://github.com).
+ 
+### Java 7+
+#### Manager de dependencias
++  __repositoryUrl:__ _http://repo.dev.redbee.io/content/repositories/decidir-sdk/_
++  __groupId:__ _com.decidir.api_
++  __artifactId:__ _decidir2-sdk-java7_
++  __version:__ _2.2_
 
-```java
-import com.decidir.sdk.Decidir;
-import com.decidir.sdk.dto.*;
-import com.decidir.sdk.exceptions.*;
-```
+#### Descarga manual
+[Versi&oacute;n 2.2](https://github.com/decidir/sdk-java-v2/blob/master/dist/decidir-v2.2-java7.jar)
+
+### Java 6
+#### Manager de dependencias
++  __repositoryUrl:__ _http://repo.dev.redbee.io/content/repositories/decidir-sdk/_
++  __groupId:__ _com.decidir.api_
++  __artifactId:__ _decidir2-sdk-java6_
++  __version:__ _2.1.4_
+
+#### Descarga manual
+[Versi&oacute;n 2.1.4](https://github.com/decidir/sdk-java-v2/blob/master/dist/decidir-v2.1.4-java6.jar)
+
 
 <a name="versionesdejavasoportadas"></a>
 ### Versiones de Java soportadas
-La versi&oacute;n implementada de la SDK, est&aacute; testeada para versiones desde Java 1.7
+La versi&oacute;n implementada de la SDK, est&aacute; testeada para versiones a partir de **Java 1.6**
 
 [<sub>Volver a inicio</sub>](#inicio)
 
@@ -125,8 +171,8 @@ import com.decidir.sdk.Decidir;
 
 public class MiClase {
 	String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-	String urlSandbox = "https://developers.decidir.com/api/v1/";
-	String urlProduccion = "https://live.decidir.com/api/v1/";
+	String urlSandbox = "https://developers.decidir.com/api/v2/";
+	String urlProduccion = "https://live.decidir.com/api/v2/";
 	int timeout = 10; // 10 segundos de timeout
 	//Para el ambiente Sandbox
 	Decidir decidirSandbox = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -154,7 +200,7 @@ A partir de ahora y por el resto de la documentaci&oacute;n, se ejemplificar&aac
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -187,7 +233,7 @@ A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n simple si
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -205,6 +251,7 @@ paymentRequest.setAmount(23250L);//Valor en centavos: $232.50
 paymentRequest.setCurrency(Currency.ARS);
 paymentRequest.setInstallments(1);
 paymentRequest.setPayment_type(PaymentType.SINGLE); //Tipo de pago simple
+paymentRequest.setFirst_installment_expiration_date("2018-05-15"); // Llenar en caso de una compra con tarjeta NacionPyme
 List<SubPayment> sub_payments = new ArrayList<SubPayment>(); // Llenar en caso de transaccion distribuida por monto
 paymentRequest.setSub_payments(sub_payments); //Debe enviarse una lista vacia
 
@@ -225,7 +272,365 @@ try {
 // ...codigo...
 ```
 
+<a name="pci"></a>
+
+#### Transacción PCI
+A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n pci sin [Cybersource](#cybersource).
+
+*Aclaracion* : amount es un campo long el cual representa el valor en centavos.
+
+```java
+// ...codigo...
+String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
+String urlSandbox = "https://developers.decidir.com/api/v2/";
+int timeout = 10; // 10 segundos de timeout
+//Ejemplo para el ambiente Sandbox
+Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
+
+Customer customer = new Customer();
+customer.setId("test"); // user_id
+customer.setEmail("test@decidir.com"); // user_email
+
+PaymentPciRequest paymentPciRequest = new PaymentPciRequest();
+CardData cardData = new CardData();
+cardData.setCard_expiration_month("12");
+cardData.setCard_expiration_year("20");
+cardData.setIp_address("192.168.1.10"); // Customer IP, en caso de usar Cybersource se usa en el campo CSBTIPADDRESS 
+
+IdentificationType type = IdentificationType.fromId(1); //tipo de documento, ejemplo dni
+String number = "23968498"; // nro de documento
+
+Identification identification = new Identification(); //identificacion personal
+identification.setNumber(number);
+identification.setType(type);
+cardData.setCard_holder_identification(identification);
+cardData.setCard_holder_name("Juan");
+cardData.setCard_number("4509790113276723");
+//RetailFraudDetectionData retail =  new RetailFraudDetectionData();
+//RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+ServicesFraudDetectionData services =  new ServicesFraudDetectionData();
+
+paymentPciRequest.setCard_data(cardData);
+paymentPciRequest.setSite_transaction_id("TX00001234"); //ID de transaccion asignada por el comercio, no puede repetirse
+paymentPciRequest.setCustomer(customer);
+paymentPciRequest.setPayment_method_id(1); //VISA
+paymentPciRequest.setBin("450979");
+paymentPciRequest.setAmount(23250L);//Valor en centavos: $232.50
+paymentPciRequest.setCurrency(Currency.ARS);
+paymentPciRequest.setInstallments(1);
+paymentPciRequest.setPayment_type(PaymentType.SINGLE); //Tipo de pago simple
+List<SubPayment> sub_payments = new ArrayList<SubPayment>(); // Llenar en caso de transaccion distribuida por monto
+paymentPciRequest.setSub_payments(sub_payments); //Debe enviarse una lista vacia
+
+try {
+	DecidirResponse<PaymentResponse> paymentResponse = decidir.payment(paymentRequest);
+	// Procesamiento de respuesta de ejecucion de pago
+	// ...codigo...
+} catch (PaymentException pe) {
+	 // Manejo de pago rechazado
+	 // ...codigo...
+} catch (DecidirException de) {
+	// Manejo de excepcion  de Decidir
+	 // ...codigo...
+} catch (Exception e) {
+	 //Manejo de excepcion general
+	// ...codigo...
+}
+// ...codigo...
+```
+
 [<sub>Volver a inicio</sub>](#inicio)
+
+
+<a name="gds"></a>
+
+#### Transacción GDS
+A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n GDS simple sin [Cybersource](#cybersource).
+
+*Aclaracion* : amount es un campo long el cual representa el valor en centavos.
+
+```java
+// ...codigo...
+String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
+String urlSandbox = "https://developers.decidir.com/api/v2/";
+int timeout = 10; // 10 segundos de timeout
+//Ejemplo para el ambiente Sandbox
+Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
+
+Customer customer = new Customer();
+customer.setId("test"); // user_id
+customer.setEmail("test@decidir.com"); // user_email
+
+GDSPaymentRequestNoPCI gdsPaymentRequest = new GDSPaymentRequestNoPCI();
+//RetailFraudDetectionData retail =  new RetailFraudDetectionData();
+//RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+ServicesFraudDetectionData services =  new ServicesFraudDetectionData();
+
+gdsPaymentRequest.setToken("a00373a5-b8d7-4d7d-b14d-4aa447726fd9"); // token de pago
+gdsPaymentRequest.setSite_transaction_id("TX00001234"); //ID de transaccion asignada por el comercio, no puede repetirse
+gdsPaymentRequest.setCustomer(customer);
+gdsPaymentRequest.setPayment_method_id(1); //VISA
+gdsPaymentRequest.setBin("450979");
+gdsPaymentRequest.setAmount(23250L);//Valor en centavos: $232.50
+gdsPaymentRequest.setCurrency(Currency.ARS);
+gdsPaymentRequest.setInstallments(1);
+gdsPaymentRequest.setPayment_type(PaymentType.SINGLE); //Tipo de pago simple
+List<SubPayment> sub_payments = new ArrayList<SubPayment>(); // Llenar en caso de transaccion distribuida por monto
+gdsPaymentRequest.setSub_payments(sub_payments); //Debe enviarse una lista vacia
+gdsPaymentRequest.setIata_code("4354437656"); // iata_code (logitud menor o igual 10)
+gdsPaymentRequest.setNro_location("11140407"); // Id site del locator (longitud 8)
+
+try {
+	DecidirResponse<PaymentResponse> paymentResponse = decidir.payment(paymentRequest);
+	// Procesamiento de respuesta de ejecucion de pago
+	// ...codigo...
+} catch (PaymentException pe) {
+	 // Manejo de pago rechazado
+	 // ...codigo...
+} catch (DecidirException de) {
+	// Manejo de excepcion  de Decidir
+	 // ...codigo...
+} catch (Exception e) {
+	 //Manejo de excepcion general
+	// ...codigo...
+}
+// ...codigo...
+```
+
+<a name="gdspci"></a>
+
+#### Transacción GDS PCI
+A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n PCI sin [Cybersource](#cybersource).
+
+*Aclaracion* : amount es un campo long el cual representa el valor en centavos.
+
+```java
+// ...codigo...
+String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
+String urlSandbox = "https://developers.decidir.com/api/v2/";
+int timeout = 10; // 10 segundos de timeout
+//Ejemplo para el ambiente Sandbox
+Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
+
+Customer customer = new Customer();
+customer.setId("test"); // user_id
+customer.setEmail("test@decidir.com"); // user_email
+
+GDSPaymentRequestPCI gdsPaymentRequest = new GDSPaymentRequestPCI();
+CardData cardData = new CardData();
+cardData.setCard_expiration_month("12");
+cardData.setCard_expiration_year("20");
+cardData.setIp_address("192.168.1.10"); // Customer IP, en caso de usar Cybersource se usa en el campo CSBTIPADDRESS
+
+IdentificationType type = IdentificationType.fromId(1);
+String number = "23968498";
+
+Identification identification = new Identification();
+identification.setNumber(number);
+identification.setType(type);
+cardData.setCard_holder_identification(identification);
+cardData.setCard_holder_name("Juan");
+cardData.setCard_number("4509790113276723");
+//RetailFraudDetectionData retail =  new RetailFraudDetectionData();
+//RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+ServicesFraudDetectionData services =  new ServicesFraudDetectionData();
+
+gdsPaymentRequest.setCard_data(cardData);
+gdsPaymentRequest.setSite_transaction_id("pci001"); //ID de transaccion asignada por el comercio, no puede repetirse
+gdsPaymentRequest.setCustomer(customer);
+gdsPaymentRequest.setPayment_method_id(1); //VISA
+gdsPaymentRequest.setBin("450979");
+gdsPaymentRequest.setAmount(23250L);//Valor en centavos: $232.50
+gdsPaymentRequest.setCurrency(Currency.ARS);
+gdsPaymentRequest.setInstallments(1);
+gdsPaymentRequest.setPayment_type(PaymentType.SINGLE); //Tipo de pago simple
+List<SubPayment> sub_payments = new ArrayList<SubPayment>(); // Llenar en caso de transaccion distribuida por monto
+gdsPaymentRequest.setSub_payments(sub_payments); //Debe enviarse una lista vacia
+gdsPaymentRequest.setIata_code("iata1"); // iata_code (logitud menor o igual 10)
+gdsPaymentRequest.setNro_location("22240407"); // Id site del locator (longitud 8)
+try {
+	DecidirResponse<PaymentResponse> paymentResponse = decidir.payment(paymentRequest);
+	// Procesamiento de respuesta de ejecucion de pago
+	// ...codigo...
+} catch (PaymentException pe) {
+	 // Manejo de pago rechazado
+	 // ...codigo...
+} catch (DecidirException de) {
+	// Manejo de excepcion  de Decidir
+	 // ...codigo...
+} catch (Exception e) {
+	 //Manejo de excepcion general
+	// ...codigo...
+}
+// ...codigo...
+```
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="bsapci"></a>
+
+#### Transacción BSA PCI
+A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n BSA PCI sin [Cybersource](#cybersource).
+
+*Aclaracion* : amount es un campo long el cual representa el valor en centavos.
+
+```java
+// ...codigo...
+String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
+String urlSandbox = "https://developers.decidir.com/api/v2/";
+int timeout = 10; // 10 segundos de timeout
+//Ejemplo para el ambiente Sandbox
+Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
+
+Customer customer = new Customer();
+customer.setId("test"); // user_id
+customer.setEmail("test@decidir.com"); // user_email
+
+BSAPaymentRequestPCI bsaPaymentRequestPCI = new BSAPaymentRequestPCI();
+
+
+IdentificationType type = IdentificationType.fromId(1);
+String number = "23968498";
+
+Identification identification = new Identification();
+identification.setNumber(number);
+identification.setType(type);
+
+bsaPaymentRequestPCI.setCard_holder_identification(identification);
+
+
+//RetailFraudDetectionData retail =  new RetailFraudDetectionData();
+//RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+ServicesFraudDetectionData services = new ServicesFraudDetectionData();
+
+bsaPaymentRequestPCI.setSite_transaction_id("bsapci015"); //ID de transaccion asignada por el comercio, no puede repetirse
+
+bsaPaymentRequestPCI.setCustomer(customer);
+bsaPaymentRequestPCI.setPayment_method_id(1); //VISA
+bsaPaymentRequestPCI.setBin("450799");
+bsaPaymentRequestPCI.setAmount(23250L);//Valor en centavos: $232.50
+bsaPaymentRequestPCI.setCurrency(Currency.ARS);
+bsaPaymentRequestPCI.setInstallments(1);
+bsaPaymentRequestPCI.setPayment_type(PaymentType.SINGLE); //Tipo de pago simple
+List<SubPayment> sub_payments = new ArrayList<SubPayment>(); // Llenar en caso de transaccion distribuida por monto
+bsaPaymentRequestPCI.setSub_payments(sub_payments); //Debe enviarse una lista vacia
+
+CardTokenBsa bsaCardData = new CardTokenBsa();
+
+bsaCardData.setPublic_token("4507993431624905");
+bsaCardData.setIssue_date("20170908");
+
+bsaCardData.setPublic_request_key("12345678");
+
+
+bsaCardData.setVolatile_encrypted_data("AvqyWXV1dXXPjUl8azlldQ5HK/gny6UJU4Wo3RFkYy2W9+D0kRfEoKeIIsFWiZh84CxKXvPX+u1j4Eqysg==");
+bsaCardData.setCard_holder_name("sarla");
+bsaCardData.setFlag_pei("1");
+bsaCardData.setFlag_security_code("1");
+bsaCardData.setFlag_selector_key("1");
+bsaCardData.setFlag_tokenization("0");
+
+bsaPaymentRequestPCI.setCard_token_bsa(bsaCardData);
+
+bsaPaymentRequestPCI.setFraud_detection(services);
+
+try {
+	DecidirResponse<PaymentResponse> paymentResponse = decidir.payment(paymentRequest);
+	// Procesamiento de respuesta de ejecucion de pago
+	// ...codigo...
+} catch (PaymentException pe) {
+	 // Manejo de pago rechazado
+	 // ...codigo...
+} catch (DecidirException de) {
+	// Manejo de excepcion  de Decidir
+	 // ...codigo...
+} catch (Exception e) {
+	 //Manejo de excepcion general
+	// ...codigo...
+}
+// ...codigo...
+```
+
+<a name="bsanopci"></a>
+
+#### Transacción BSA no PCI
+
+Las transacciones BSA no PCI operan de manera idéntica a las [transacciones simples](#single), para realizar una operacion por bsa no pci basta con seguir el mismo ejemplo que el visto en las transacciones simples.
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="bsapci"></a>
+
+#### Transacción Agro no PCI
+A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n Agro simple sin [Cybersource](#cybersource).
+
+*Aclaracion* : amount es un campo long el cual representa el valor en centavos.
+
+```java
+// ...codigo...
+String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
+String urlSandbox = "https://developers.decidir.com/api/v2/";
+int timeout = 10; // 10 segundos de timeout
+//Ejemplo para el ambiente Sandbox
+Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
+
+Customer customer = new Customer();
+customer.setId("test"); // user_id
+customer.setEmail("test@decidir.com"); // user_email
+
+AgroPaymentRequestNoPCI agroPaymentRequestNoPCI = new AgroPaymentRequestNoPCI();
+//RetailFraudDetectionData retail =  new RetailFraudDetectionData();
+//RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+ServicesFraudDetectionData services = new ServicesFraudDetectionData();
+
+agroPaymentRequestNoPCI.setToken("2f9c80b0-ebb9-4c75-b5e7-098a8c32b63a"); // token de pago
+agroPaymentRequestNoPCI.setSite_transaction_id("agro0016"); //ID de transaccion asignada por el comercio, no puede repetirse
+agroPaymentRequestNoPCI.setCustomer(customer);
+agroPaymentRequestNoPCI.setPayment_method_id(80); //VISA
+agroPaymentRequestNoPCI.setBin("448459");
+agroPaymentRequestNoPCI.setAmount(23250L);//Valor en centavos: $232.50
+agroPaymentRequestNoPCI.setCurrency(Currency.ARS);
+//agroPaymentRequestNoPCI.setInstallments(1);
+
+InstallmentData i1 = new InstallmentData();
+i1.setId(1);
+i1.setAmount(23250L);
+i1.setDate(new Date());
+List<InstallmentData> l = new ArrayList<InstallmentData>();
+l.add(i1);
+agroPaymentRequestNoPCI.setInstallmentList(l);
+
+agroPaymentRequestNoPCI.setPayment_type(PaymentType.SINGLE); //Tipo de pago simple
+
+AgroData agroData = new AgroData();
+agroData.setToken("123456");
+agroData.setToken_type("T");
+agroData.setDays_agreement(360);
+
+agroPaymentRequestNoPCI.setAgro_data(agroData);
+
+List<SubPayment> sub_payments = new ArrayList<SubPayment>(); // Llenar en caso de transaccion distribuida por monto
+agroPaymentRequestNoPCI.setSub_payments(sub_payments); //Debe enviarse una lista vacia
+
+try {
+    DecidirResponse<AgroPaymentResponse> paymentResponse = decidir.payment(agroPaymentRequestNoPCI);
+    System.out.println(paymentResponse.getMessage());
+    System.out.println("aaa");
+} catch (PaymentException pe) {
+    // Manejo de pago rechazado
+    // ...codigo...
+} catch (DecidirException de) {
+    // Manejo de excepcion  de Decidir
+    // ...codigo...
+} catch (Exception e) {
+    //Manejo de excepcion general
+    // ...codigo...
+}
+// ...codigo...
+```
+
+[<sub>Volver a inicio</sub>](#inicio)
+
 
 <a name="distributed"></a>
 
@@ -235,10 +640,17 @@ Existen transacciones distribuidas definidas por monto o por porcentaje. Para in
 A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n distribuida por monto sin [Cybersource](#cybersource).
 *Aclaracion* : amount es un campo long el cual representa el valor en centavos.
 
+*Nota Técnica*: A diferencia de las Transacciones Simples, para las Transacciones Distribuidas, el parámetro payment_type debe ser <code>PaymentType.DISTRIBUTED</code>; y el parámetro sub_payments 
+se debe popular con los sub-sitios y los montos distribuidos de manera dinámica.
+
+* En Transacciones distribuidas por Monto, la sumatoria de los montos distribuidos debe ser exactamente igual al monto total de la operación Padre.
+* En Transacciones distribuidas por Porcentaje, el parámetro sub_payments no debe completarse, pues la distribución es estática 
+y se configura en el SAC.
+
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -303,7 +715,7 @@ A continuaci&oacute;n se muestra un ejemplo con una transacci&oacute;n simple si
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -367,7 +779,7 @@ Este recurso admite la posibilidad de agregar filtros adicionales
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -402,7 +814,7 @@ Mediante este recurso, se genera una solicitud de información de un pago previa
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -441,12 +853,12 @@ Mediante este recurso, se genera una solicitud de anulación / devolución total
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
 long idPago = 000123L; //ID devuelto por la operacion de pago (NO CONFUNDIR con site_transaction_id asignado por el comercio)
-String usuario = "usuario_que_realiza_la_accion"; //Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
+String usuario = "usuario_que_realiza_la_accion"; //OPCIONAL NULLABLE, Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
 RefundPayment refundPayment = new RefundPayment(); //Se instancia sin datos
 try {
 	DecidirResponse<RefundPaymentResponse> devolucion = decidir.refundPayment(idPago, refundPayment, usuario);
@@ -475,13 +887,13 @@ Mediante este recurso, se genera una solicitud de anulación de devolución tota
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
 long idPago = 000123L;//ID devuelto por la operacion de pago (NO CONFUNDIR con site_transaction_id asignado por el comercio)
 long idDevolucion = 00012L;//ID devuelto por la operacion de devolucion
-String usuario = "usuario_que_realiza_la_accion"; //Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
+String usuario = "usuario_que_realiza_la_accion"; //OPCIONAL NULLABLE, Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
 
 try {
 	DecidirResponse<AnnulRefundResponse> anulacion = decidir. cancelRefund(idPago, idDevolucion, usuario)
@@ -511,12 +923,12 @@ Mediante este recurso, se genera una solicitud de devolución parcial de un pago
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
 long idPago = 000123L; //ID devuelto por la operacion de pago (NO CONFUNDIR con site_transaction_id asignado por el comercio)
-String usuario = "usuario_que_realiza_la_accion"; //Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
+String usuario = "usuario_que_realiza_la_accion"; //OPCIONAL NULLABLE, Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
 long  montoDevolucion = 1250L // Expresado en centavos
 
 RefundPayment refundPayment = new RefundPayment();
@@ -549,13 +961,13 @@ Mediante este recurso, se genera una solicitud de anulación de devolución parc
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
 long idPago = 000123L;//ID devuelto por la operacion de pago (NO CONFUNDIR con site_transaction_id asignado por el comercio)
 long idDevolucion = 00012L;//ID devuelto por la operacion de devolucion
-String usuario = "usuario_que_realiza_la_accion"; //Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
+String usuario = "usuario_que_realiza_la_accion"; //OPCIONAL NULLABLE, Usuario habilitado para realizar la anulacion/devolucion. Se utiliza para matener un registro de quien realiza la operacion
 try {
 	DecidirResponse<AnnulRefundResponse> anulacion = decidir.cancelRefund(idPago, idDevolucion, usuario)
 	// Procesamiento de respuesta de anulacion de devolucion
@@ -595,7 +1007,7 @@ Este recurso admite la posibilidad de agregar filtros adicionales.
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -634,7 +1046,7 @@ del Customer).
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -683,7 +1095,7 @@ El servicio da la posibilidad de eliminar un token de tarjeta generadas, esto se
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -769,7 +1181,7 @@ fraudDetectionData.setCopy_paste_card_data(copyPasteCardData);//Subclase de com.
 5.  _**Otros campos**_
 ```java
 // ...codigo...
-fraudDetectionData.setChannel(Channel.WEB);
+fraudDetectionData.setChannel(Channel.WEB);//Tambien puede recibir un valor de tipo String 
 fraudDetectionData.setDispatch_method("domicilio");//{domicilio, click and collect, courrier}
 fraudDetectionData.setSend_to_cs(Boolean.true);// true o false
 fraudDetectionData.setDevice_unique_id("fingerprint-del-cliente");//Subclase de com.decidir.sdk.dto.FraudDetectionDataRequest
@@ -825,7 +1237,7 @@ Para incorporar estos datos en el requerimiento inicial, se debe instanciar un o
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -889,7 +1301,7 @@ Para incorporar estos datos en el requerimiento inicial, se debe instanciar un o
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -901,6 +1313,101 @@ TicketingTransactionData ticketing =  new TicketingTransactionData();
 //Datos de vertical Ticketing
 // ...codigo...
 paymentRequest.setFraud_detection(ticketing);
+try {
+	DecidirResponse<PaymentResponse> paymentResponse = decidir.payment(paymentRequest);
+	// Procesamiento de respuesta de ejecucion de pago
+	// ...codigo...
+} catch (PaymentException pe) {
+	 // Manejo de pago rechazado
+	 // ...codigo...
+} catch (DecidirException de) {
+	// Manejo de excepcion  de Decidir
+	 // ...codigo...
+} catch (Exception e) {
+	 //Manejo de excepcion general
+	// ...codigo...
+}
+// ...codigo...
+```
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="retailTP"></a>
+
+### RetailTP
+Se enviá un `RetailTPFraudDetectionData` con los [parámetros comunes](#parametros-comunes) y con los siguientes parámetros que se deben enviar específicamente para la vertical RetailTP. Además se deben enviar datos específicos de cada producto involucrado en la transacción.
+
+```java
+// ...codigo...
+RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+//seteo de parámetros comunes
+// ...codigo...
+RetailTPTransactionData retailTPTransactionData = new RetailTPTransactionData();//Datos para la vertical RetailTP
+//Datos de envio
+ShippingData shipTo = new ShippingData();
+shipTo.setCity("Buenos Aires"); //Ciudad de envío, MANDATORIO.
+shipTo.setCountry("AR"); //País de envío. MANDATORIO. Código ISO. (http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf)
+shipTo.setEmail("usuario@email.com.ar");//Mail del destinatario. MANDATORIO.
+shipTo.setFirst_name("Usuario"); //Nombre del destinatario. MANDATORIO.
+shipTo.setLast_name("Prueba");//Apellido del destinatario. MANDATORIO.
+shipTo.setPhone_number("54116763329");//Teléfono del destinatario. No utilizar guiones, puntos o espacios. Incluir código de país. MANDATORIO.
+shipTo.setPostal_code("1414");//Código Postal de la dirección de envío. MANDATORIO.
+shipTo.setState("C");//Provincia de la dirección de envío. MANDATORIO. Ver tabla anexa de provincias.
+shipTo.setStreet1("THAMES 677");//Domicilio de envío (calle y nro). MANDATORIO.
+shipTo.setStreet2("4to F");//Complemento del domicilio. (piso, departamento). OPCIONAL.
+retailTPTransactionData.setShip_to(shipTo);//Datos de envio. MANDATORIO
+retailTPTransactionData.setDays_to_delivery("2");
+retailTPTransactionData.setTax_voucher_required(Boolean.TRUE);
+retailTPTransactionData.setCustomer_loyality_number("123232");
+setCoupon_code("cupon22");
+//Items de compra (Al menos un item)
+Item item = new Item();
+item.setCode("popblacksabbat2016");  //MANDATORIO
+item.setDescription("Popular Black Sabbath 2016"); //OPCIONAL
+item.setName("popblacksabbat2016ss");//MANDATORIO
+item.setSku("sku");//MANDATORIO
+item.setTotal_amount(34900L);//MANDATORIO
+item.setQuantity(1);//MANDATORIO
+item.setUnit_price(34900L);//MANDATORIO
+ticketingTransactionData.setItems(Arrays.asList(item); //Items de compra. MANDATORIO
+
+Account account = new Account();
+account.setId("account_id");
+account.setType("account_type");
+account.setName("account_name");
+account.setCategory(123);
+account.setAntiquity(12);
+
+Wallet wallet = new Wallet();
+wallet.setId("wallet_id");
+wallet.setAntiquity(12);
+
+retailTPTransactionData.setAccount(account);
+retailTPTransactionData.setWallet_account(wallet);
+retailTPTransactionData.setPayment_method_risk_level(33);
+retailTPTransactionData.setEnroled_card_quantity(22);
+retailTPTransactionData.setDouble_factor_tp(1);
+
+retailTP.setRetailTP_transaction_data(retailTPTransactionData);//Datos de vertical RetailTP. MANDATORIO
+// ...codigo...
+```
+
+Para incorporar estos datos en el requerimiento inicial, se debe instanciar un objeto de la clase `RetailTPFraudDetectionData` de la siguiente manera.
+
+```java
+// ...codigo...
+String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
+String urlSandbox = "https://developers.decidir.com/api/v2/";
+int timeout = 10; // 10 segundos de timeout
+//Ejemplo para el ambiente Sandbox
+Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
+PaymentRequest paymentRequest = new PaymentRequest();
+// Datos del pago
+ // ...codigo...
+ RetailTPFraudDetectionData retailTP =  new RetailTPFraudDetectionData();
+//Datos de vertical RetailTP
+// ...codigo...
+paymentRequest.setFraud_detection(retailTP);
 try {
 	DecidirResponse<PaymentResponse> paymentResponse = decidir.payment(paymentRequest);
 	// Procesamiento de respuesta de ejecucion de pago
@@ -953,7 +1460,7 @@ Para incorporar estos datos en el requerimiento inicial, se debe instanciar un o
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -1042,7 +1549,7 @@ Para incorporar estos datos en el requerimiento inicial, se debe instanciar un o
 ```java
 // ...codigo...
 String privateApiKey = "92b71cf711ca41f78362a7134f87ff65";//Private API Key habilitada para operar en ambiente Sandbox
-String urlSandbox = "https://developers.decidir.com/api/v1/";
+String urlSandbox = "https://developers.decidir.com/api/v2/";
 int timeout = 10; // 10 segundos de timeout
 //Ejemplo para el ambiente Sandbox
 Decidir decidir = new Decidir(privateApiKey, urlSandbox, timeout);
@@ -1083,7 +1590,12 @@ Luego de haber realizado una operación, DECIDIR devuelve los siguientes objetos
 
 Es usado en:
 *   [Transacción Simple](#single)
-*   [Transacción PCI]()
+*   [Transacción PCI](#pci)
+*   [Transacción GDS](#gds)
+*   [Transacción GDS PCI](#gdspci)
+*   [Transacción BSA PCI](#bsapci)
+*   [Transacción BSA no PCI](#bsanopci)
+*   [Transacción Agro no PCI](#agronopci)
 *   [Transacción Pci por Token]()
 *   [Información de un Pago](#getpaymentinfo)
 *   [Operación en dos pasos](#twosteps)
@@ -1421,6 +1933,110 @@ try {
 
 [<sub>Volver a inicio</sub>](#inicio)
 
+<a name="parametros"></a>
+
+### Parámetros
+En ésta sección se describirán todos los parámetros utilizados por la SDK para realizar Operaciones 
+y Transacciones.
+
+<a name="parametrosPago"></a>
+#### Parámetros de Pagos
+
+|Campo              |Definición                                                                                                                                               |Obligatorio(SI/NO)|Validación                                                                                                        |Ejemplo                                |
+|:------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------|:--------------------------------------|
+|user_id            |usuario que esta haciendo uso del sitio (se utiliza para tokenizacion)                                                                                   |Condicional       |Sin validacion                                                                                                    |user_id: "marcos"                      |
+|site_transaction_id|nro de operacion                                                                                                                                         |SI                |Alfanumerico de hasta 39 caracteres                                                                               |site_transaction_id: "prueba 1"        |
+|site_id            |Site relacionado a otro site, este mismo no requiere del uso de la apikey ya que para el pago se utiliza la apikey del site al que se encuentra asociado.|NO                |Se debe encontrar configurado en la tabla site_merchant como merchant_id del site_id</br>Numérico de 8 caracteres.|site_id: "28464385"                    |
+|token              |token generado en el primer paso                                                                                                                         |SI                |Alfanumerico de hasta 36 caracteres. No se podra ingresar un token utilizado para un  pago generado anteriormente.|token: ""                              |
+|payment_method_id  |id del medio de pago                                                                                                                                     |SI                |El id debe coincidir con el medio de pago de tarjeta ingresada.                                                   |payment_method_id: 1                   |
+|bin                |primeros 6 numeros de la tarjeta                                                                                                                         |SI                |Se valida que sean los primeros 6 digitos de la tarjeta ingresada al generar el token.                            |bin: "456578"                          |
+|amount             |importe del pago                                                                                                                                         |SI                |Importe minimo = 1 ($0.01)</br> Importe Maximo = 9223372036854775807 ($92233720368547758.07)                      |amount: 20000                          |
+|currency           |moneda                                                                                                                                                   |SI                |Valor permitido: ARS                                                                                              |currency: "ARS"                        |
+|installments       |cuotas del pago                                                                                                                                          |SI                |Valor minimo = 1</br>Valor maximo = 99                                                                            |installments: 1                        |
+|payment_type       |forma de pago                                                                                                                                            |SI                |Valor permitido: single / distributed                                                                             |payment_type: "single"                 |
+|establishment_name |nombre de comercio                                                                                                                                       |Condicional       |Alfanumerico de hasta 25 caracteres                                                                               |establishment_name : "prueba desa soft"|
+
+
+<a name="parametrosPMC"></a>
+##### Parámetros para PagoMisCuentas
+
+|Campo             |Definición                                                                                                                    |Obligatorio(SI/NO)|Validación          |Ejemplo                           |
+|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------|:-----------------|:-------------------|:---------------------------------|
+|bank_code         |ID del banco que se utilizara para realizar el pago.</br>Se guarda en la tabla spstransac.idbanco                             |SI                |Dato variable       |bank_code : "17"                  |
+|invoice_expiration|Fecha y hora de vencimiento de la factura. Puede omitirse las 'horas' y 'minutos', informando solo la fecha con formato DDMMYY|SI                |Formato: DDMMYY HHMM|invoice_expiration : "311219 2359"|
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="parametrosOffline"></a>
+##### Parámetros para Pagos Offline
+
+|Campo             |Definición                                                                                                                                    |Obligatorio(SI/NO)|Validación                            |Ejemplo                        |
+|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|:-----------------|:-------------------------------------|:------------------------------|
+|cod_p3            |Son los días que existen entre el 1º y 2º vencimiento de la factura. Poner “00” si la factura no tiene 2º vencimiento.                        |SI                |Longitud 2 caracteres numéricos       |"cod_p3": "11"                 |
+|cod_p4            |Son los días después del 1º vencimiento y hasta el que el cliente puede pagar la factura por Rapipago.                                        |SI                |Longitud 3 caracteres numéricos       |"cod_p4": "134"                |
+|client            |-Código de cliente provisto al momento de habilitar al comercio.</br>-Nro de establecimiento visa dentro de visa, nro fijo para cada comercio|SI                |8 dígitos numericos , dato fijo       |"client": "12345678"           |
+|surcharge         |Recargo por Vto. del plazo, dato generado por el comercio. Es un monto (no un porcentaje). 5 cifras enteras y 2 decimales.                    |SI                |Longitud máxima 7 caracteres numericos|"surcharge": 1234567           |
+|invoice_expiration|Fecha de vencimiento para el pago del cupón, dato generado por el comercio                                                                    |SI                |Formato: AAMMDD                       |"invoice_expiration" : "191223"|
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="parametrosDistMonto"></a>
+##### Parámetros para Pagos Distribuidos por Monto
+
+
+|Campo                    |Definición                    |Obligatorio(SI/NO)|Validación                                                                          |Ejemplo            |
+|:------------------------|:-----------------------------|:-----------------|:-----------------------------------------------------------------------------------|:------------------|
+|sub_payments.site_id     |site_id del sub_payment       |SI                |Numérico de 8 caracteres, se debe encontrar habilitado y vinculado al site padre    |site_id: "28464384"|
+|sub_payments.installments|Cuotas del sub_payment        |SI                |Valor minimo = 1 </br> Valor maximo = 99                                            |installments: 5    |
+|sub_payments.amount      |Monto que lleva el sub_payment|SI                |Monto total para un pago = 9223372036854775807. Este mismo es parte del amount Total|amount: 10000      |
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="parametrosDistPorc"></a>
+##### Parámetros para Pagos Distribuidos por Porcentaje
+
+Las transacciones distribuidas por Porcentaje no llevan parámetros adicionales pues 
+la distribución de pagos se realiza estáticamente.
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="parametrosAgregador"></a>
+##### Parámetros para pagos de Comercios Agregadores.
+
+
+|Campo                |Definición                                                                           |Obligatorio(SI/NO)    |Validación                                                                           |Ejemplo                                |
+|:--------------------|:------------------------------------------------------------------------------------|:---------------------|:------------------------------------------------------------------------------------|:--------------------------------------|
+|indicator            |Indicador del tipo de documento                                                      |SI                    |Numérico, 1 dígito.</br>Valores posibles: 0 CUIT, 1 CUIL, 2 Número único             |"indicator" : "0"                      |
+|identification_number|Numero de CUIT, CUIL o Numero Único (en este caso completar con ceros a la izquierda)|SI                    |Caracter, 11 posiciones                                                              |"identification_number" : "20380902325"|
+|bill_to_pay          |Numero de Factura a Pagar                                                            |SI (Visa), NO (Master)|Alfanumérico 12 caracteres.                                                          |"bill_to_pay" : "1234km1"              |
+|bill_to_refund       |Número de factura de anulación/Devolución                                            |SI (Visa), NO (Master)|Alfanumérico 12 caracteres.                                                          |"bill_to_refund" : "1234567m90120"     |
+|merchant_name        |Nombre de comercio o nombre y apellido del vendedor                                  |SI (Visa), NO (Master)|Alfanumérico 20 caracteres. En caso de nombre y apellido, deben estar separados por /|"merchant_name" : "dario/gomez"        |
+|street               |Dirección del comercio o del vendedor                                                |SI (Visa), NO (Master)|Alfanumérico 20 caracteres.                                                          |"street" : "Jose Maria"                |
+|number               |Número de puerta                                                                     |SI (Visa), NO (Master)|Alfanumérico 6 caracteres.                                                           |"number" : "9898"                      |
+|postal_code          |Código postal                                                                        |SI (Visa), NO (Master)|Alfanumérico 8 caracteres.                                                           |"postal_code" : "1234"                 |
+|category             |Código de actividad (rubro)                                                          |SI (Visa), NO (Master)|Alfanumérico 5 caracteres.                                                           |"category" : "1234m"                   |
+|channel              |Código de canal                                                                      |SI (Visa), NO (Master)|Alfanumérico 3 caracteres.                                                           |"channel" : "89j"                      |
+|geographic_code      |Código geográfico del vendedor                                                       |SI (Visa), NO (Master)|Alfanumérico 5 caracteres.                                                           |"geographic_code" : "12345"            |
+|city		      |Ciudad del domicilio del comercio vendedor                                           |SI (Amex), NO (Visa / Master)|Alfanumérico 15 caracteres como máximo.                                       |"city" : "C.A.B.A."	                 |
+|merchant_id	      |Identificador único del comercio vendedor                                            |SI (Amex), NO (Visa / Master)|Numérico de 16 dígitos como máximo.                                       	 |"merchant_id" : "12345"     		 |
+|province  	      |Provincia del comercio vendedor                                                      |SI (Amex), NO (Visa / Master)|Caracter 1 posición. [<sub>Valores posibles</sub>](#provincias)               |"province" : "C"                       |
+|country     	      |País del comercio vendedor	                                                    |SI (Amex), NO (Visa / Master)|Numérico de 3 caracteres. </br> "032" para Argentina                          |"country" : "032"                      |
+|merchant_email       |Email del comercio vendedor                                                          |SI (Amex), NO (Visa / Master)|Alfanumérico 40 caracteres como máximo.                                       |"merchant_email" : "com@decidir.com"   |
+|merchant_phone       |Teléfono del comercio vendedor                                                       |SI (Amex), NO (Visa / Master)|Numérico 20 caracteres como máximo.                                           |"merchant_phone" : "48021111"          |
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+
+<a name="parametrosDevolucion"></a>
+#### Parámetros para Devoluciones parciales, totales y Anulaciones.
+
+
+|Campo |Definición                                                                                                                                                                                                                       |Obligatorio(SI/NO)|Validación                                                                                          |Ejemplo     |
+|:-----|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------|:---------------------------------------------------------------------------------------------------|:-----------|
+|amount|Importe del pago a devolver.</br> Si se completa el campo antes del cierre por un monto menor al de la compra se toma como devolucion parcial</br> Si se ingresa el monto total o no se envia dicho campo se toma como anulacion.|NO                |Monto total para un pago = 9223372036854775807. Este mismo se debe distribuir sobre los subpayments.|amount: 1000|
+
+[<sub>Volver a inicio</sub>](#inicio)
+
 <a name="atributosExcepciones"></a>
 
 ### Atributos de Excepciones
@@ -1438,5 +2054,20 @@ try {
 |message          |String               |Descripción del error           |[ApiError](#apiException)<br/>[NotFoundError](#notFoundException)                                          |
 |id               |String               |Valor identificatorio           |[NotFoundError](#notFoundException)                                                                        |
 |entityName       |String               |Nombre de la entidad involucrada|[NotFoundError](#notFoundException)                                                                        |
+
+[<sub>Volver a inicio</sub>](#inicio)
+
+<a name="erroresSistema"></a>
+
+### Errores de Sistema
+Estos códigos de Errores son los status en las Excepciones.
+
+|Código(HTTP)|Mensaje                |Descripción                                     |
+|:-----------|:----------------------|:-----------------------------------------------|
+|400         |malformed_request_error|Error en la comunicación del SDK con el API REST|
+|401         |authentication_error   |ApiKey Inválido                                 |
+|402         |invalid_request_error  |Error por datos inválidos                       |
+|404         |not_found_error        |Error con datos no encontrados                  |
+|409         |api_error              |Error inesperado en la API REST                 |
 
 [<sub>Volver a inicio</sub>](#inicio)

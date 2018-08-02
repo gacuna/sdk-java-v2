@@ -1,14 +1,13 @@
 package com.decidir.sdk.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.io.Serializable;
 import java.util.List;
+
+import com.decidir.sdk.exceptions.ValidationError;
 
 /**
  * Created by biandra on 12/07/16.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ErrorType implements Serializable{
 
     private String error_type;

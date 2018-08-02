@@ -1,7 +1,7 @@
 package com.decidir.sdk.resources;
 
-import com.decidir.sdk.dto.DataForm;
-import com.decidir.sdk.dto.FormResponse;
+import com.decidir.sdk.dto.forms.DataForm;
+import com.decidir.sdk.dto.forms.FormResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

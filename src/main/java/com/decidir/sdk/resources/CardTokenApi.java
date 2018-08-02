@@ -1,6 +1,6 @@
 package com.decidir.sdk.resources;
 
-import com.decidir.sdk.dto.CardTokens;
+import com.decidir.sdk.dto.tokens.CardTokens;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;

@@ -1,6 +1,11 @@
 package com.decidir.sdk
 
-import com.decidir.sdk.exceptions.RefundException
+import com.decidir.sdk.dto.payments.pci.CardTrackInfo
+import com.decidir.sdk.dto.refunds.RefundMPOSPayment
+import com.decidir.sdk.dto.refunds.RefundPayment
+import com.decidir.sdk.dto.refunds.RefundSubPayment
+import com.decidir.sdk.dto.refunds.RollbackMPOSPayment
+import com.decidir.sdk.exceptions.responses.RefundException
 import spock.lang.*
 import com.decidir.sdk.dto.*
 
@@ -86,7 +91,7 @@ class RefundServiceTests extends Specification {
   def "test payment refunded with card track info"() {
     setup:
     def paymentId = 10642
-    def refundPayment = new RefundPayment()
+    def refundPayment = new RefundMPOSPayment()
     def user = "ccopello"
     refundPayment.amount = 3
 
@@ -99,6 +104,31 @@ class RefundServiceTests extends Specification {
 
     when:
     def result = decidir.refundPayment(paymentId, refundPayment, user)
+
+    then:
+    result.status == 201
+    result.result.id != null
+    result.result.amount != null
+    result.result.status == Status.APPROVED
+  }
+
+  def "test rollback of refunded payment with card track info"() {
+    setup:
+    def paymentId = 10642
+    def refundId = 300
+    def user = "ccopello"
+    def rollbackPayment = new RollbackMPOSPayment()
+
+    def cardTrackInfo = new CardTrackInfo()
+    cardTrackInfo.card_track_1 = "B4507990000004905^Valentin Santiago Gomez^2010datosdiscrecionales"
+    cardTrackInfo.card_track_2 = "4507990000004905=2010datosdiscrecionales"
+    cardTrackInfo.input_mode = "021"
+
+    rollbackPayment.setCard_track_info(cardTrackInfo)
+    rollbackPayment.security_code = 123
+
+    when:
+    def result = decidir.cancelRefund(paymentId, refundId, rollbackPayment, user)
 
     then:
     result.status == 201

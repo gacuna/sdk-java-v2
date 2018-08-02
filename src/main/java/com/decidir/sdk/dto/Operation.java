@@ -18,7 +18,7 @@ public enum Operation {
     ANNULMENT_REFUND_ACCREDITATION,
     UNDEFINED;
 
-    private static Map<String, Operation> operationMap = new HashMap<>(6);
+    private static Map<String, Operation> operationMap = new HashMap(6);
     static {
         operationMap.put("anulacion", ANNULMENT);
         operationMap.put("devolucion", REFUND);

@@ -1,11 +1,11 @@
 package com.decidir.sdk
 
-import com.decidir.sdk.dto.Currency
-import com.decidir.sdk.dto.Customer
-import com.decidir.sdk.dto.DataForm
-import com.decidir.sdk.dto.PaymentForm
-import com.decidir.sdk.dto.PaymentType
-import com.decidir.sdk.dto.SiteForm
+import com.decidir.sdk.dto.payments.Currency
+import com.decidir.sdk.dto.payments.Customer
+import com.decidir.sdk.dto.forms.DataForm
+import com.decidir.sdk.dto.forms.PaymentForm
+import com.decidir.sdk.dto.payments.PaymentType
+import com.decidir.sdk.dto.forms.SiteForm
 import spock.lang.Specification
 
 /**
